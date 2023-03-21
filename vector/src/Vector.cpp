@@ -34,10 +34,74 @@ Vector& Vector::operator=(const Vector &other)
 	return *this;
 }
 
+int& Vector::operator[](size_t index)
+{
+	if (isInRange(index)) 
+		return _data[index];	
+}
+
+int Vector::operator[](size_t index) const
+{
+	if (isInRange(index)) 
+		return _data[index];
+}
+
+bool Vector::isInRange(size_t index) const
+{
+	return index < _size;
+}
+
 void Vector::print()
 {
+	std::cout << "size: " << _size << " capacity: " << _capacity << '\n';
 	for (int i = 0; i < _size; i++)
-		std::cout << _data[i];
+		std::cout << _data[i] << " ";
+	std::cout << std::endl;
+}
+
+void Vector::swap(Vector& other)
+{
+	Vector temp = other;
+	other = *this;
+	*this = temp;	
+}
+
+void Vector::resize(size_t capacity)
+{
+	if (capacity == _capacity)
+		return;
+
+	int* temp = new int[capacity];
+	for (int i = 0; i < capacity; i++)
+		if (i < _capacity)
+			temp[i] = _data[i];
+		else
+			temp[i] = 0;
+	delete[] _data;
+	_data = temp;
+	_size = capacity < _capacity ? capacity : _size;
+	_capacity = capacity;
+	
+}
+
+void Vector::push_back(const int& value)
+{
+	if (_size < _capacity)
+		_data[_size] = value;
+	else
+	{
+		double multiply = _capacity > 128 ? 1.5 : 2;
+		size_t newCapacity = (size_t)(_capacity * multiply);
+		resize(newCapacity);
+		_data[_size] = value;
+	}
+	_size++;
+}     
+
+void Vector::pop_back()
+{
+	_size--;
+	_data[_size] = 0;
 }
 
 size_t Vector::size()

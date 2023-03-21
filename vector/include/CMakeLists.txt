@@ -1,0 +1,1 @@
+target_include_directories (tasks_week1_shaked_vaknin PRIVATE ${CMAKE_CURRENT_LIST_DIR})

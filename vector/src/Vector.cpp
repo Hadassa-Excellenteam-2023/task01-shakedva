@@ -35,6 +35,32 @@ Vector& Vector::operator=(const Vector &other)
 	return *this;
 }
 
+Vector::Vector(Vector&& other) 
+	: _size(other._size), _capacity(other._capacity), _data(other._data)
+{
+	std::cout << "in move ctor\n";
+	other._size = 0;
+	other._capacity = 0;
+	other._data = nullptr;
+}
+
+Vector& Vector::operator=(Vector&& other)
+{
+	std::cout << "in move assignment\n";
+	if (this != &other)
+	{
+		delete[] _data;
+		_data = other._data;
+		_size = other._size;
+		_capacity = other._capacity;
+
+		other._size = 0;
+		other._capacity = 0;
+		other._data = nullptr;
+	}
+	return *this;
+}
+
 int& Vector::operator[](size_t index)
 {
 	if (isInRange(index)) 
@@ -52,9 +78,17 @@ bool Vector::isInRange(size_t index) const
 	return index < _size;
 }
 
+void Vector::addCapacity()
+{
+	_capacity = (_capacity == 0) ? 1 : _capacity;
+	double multiply = _capacity > 128 ? 1.5 : 2;
+	size_t newCapacity = (size_t)(_capacity * multiply);
+	resize(newCapacity);
+}
+
 void Vector::print()
 {
-	std::cout << "size: " << _size << " capacity: " << _capacity << '\n';
+	//std::cout << "size: " << _size << " capacity: " << _capacity << '\n';
 	for (int i = 0; i < _size; i++)
 		std::cout << _data[i] << " ";
 	std::cout << std::endl;
@@ -87,15 +121,10 @@ void Vector::resize(size_t capacity)
 
 void Vector::push_back(const int& value)
 {
-	if (_size < _capacity)
-		_data[_size] = value;
-	else
-	{
-		double multiply = _capacity > 128 ? 1.5 : 2;
-		size_t newCapacity = (size_t)(_capacity * multiply);
-		resize(newCapacity);
-		_data[_size] = value;
-	}
+	if (_size >= _capacity)
+		addCapacity();
+
+	_data[_size] = value;
 	_size++;
 }     
 
@@ -103,6 +132,33 @@ void Vector::pop_back()
 {
 	_size--;
 	_data[_size] = 0;
+}
+
+void Vector::erase(size_t index)
+{
+	if (index > _size) {
+		std::cout << "Index out of range" << std::endl;
+		return;
+	}
+	for (size_t i = index; i < _size-1; i++)
+		_data[i] = _data[i + 1];
+	_size--;
+}
+
+void Vector::insert(size_t index, const int& value)
+{
+	if (index == _size)
+		push_back(value);
+	else
+	{
+		if (_size >= _capacity)
+			addCapacity();
+
+		for (int i = _size; i > index; i--)
+			_data[i] = _data[i - 1];
+		_data[index] = value;
+		_size++;
+	}
 }
 
 size_t Vector::size() const

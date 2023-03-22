@@ -7,9 +7,8 @@ public:
 	Vector(size_t size = 0, int value = 0);
 	Vector(const Vector&); // copy c-tor
 	~Vector();
-
-	size_t size();
-	size_t capacity();
+	size_t size() const;
+	size_t capacity() const;
 	bool empty();
 	int* data();
 	void clear();
@@ -21,9 +20,17 @@ public:
 	Vector& operator=(const Vector&);
 	int& operator[](size_t);
 	int operator[](size_t) const;
+	bool operator>(const Vector&);
+	bool operator>=(const Vector&);
+	bool operator<(const Vector&);
+	bool operator<=(const Vector&);
+
 private:
 	bool isInRange(size_t) const;
 	size_t _size;
 	size_t _capacity;
 	int* _data;
 };
+
+bool operator==(const Vector&, const Vector&);
+bool operator!=(const Vector&, const Vector&);

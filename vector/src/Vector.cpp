@@ -1,4 +1,5 @@
 #include "Vector.h"
+#include <algorithm>
 
 Vector::Vector(size_t size, int value) : _size(size), _capacity(size), _data(new int[size])
 {
@@ -104,12 +105,12 @@ void Vector::pop_back()
 	_data[_size] = 0;
 }
 
-size_t Vector::size()
+size_t Vector::size() const
 {
 	return _size;
 }
 
-size_t Vector::capacity()
+size_t Vector::capacity() const
 {
 	return _capacity;
 }
@@ -131,3 +132,51 @@ void Vector::clear()
 	_size = 0;
 }	
 
+// lexicographically greater than the contents of other
+bool Vector::operator>(const Vector& other)
+{
+	size_t i = 0;
+	while (i < _size && i < other._size)
+	{
+		if (_data[i] > other._data[i])
+			return true;
+		if (_data[i] < other._data[i])
+			return false;
+		++i;
+	}
+	return _size > other._size;
+}
+
+bool Vector::operator>=(const Vector& other)
+{
+	return *this > other || *this == other ;
+}
+
+bool Vector::operator<(const Vector& other)
+{
+	return !(*this >= other);
+}
+
+bool Vector::operator<=(const Vector& other)
+{
+	return *this < other || *this == other;
+}
+
+bool operator==(const Vector& l, const Vector& r)
+{
+	if (l.size() != r.size())
+		return false;
+	if (l.capacity() != r.capacity())
+		return false;
+	for (int i = 0; i < l.size(); i++)
+	{
+		if (l[i] != r[i])
+			return false;
+	}
+	return true;
+}
+
+bool operator!=(const Vector& l, const Vector& r)
+{
+	return !(l == r);
+}

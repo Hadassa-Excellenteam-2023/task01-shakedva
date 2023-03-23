@@ -170,7 +170,6 @@ void Vector::pop_back()
 */
 void Vector::erase(size_t index)
 {
-	
 	if (!isInRange(index)) {
 		std::cout << "Index out of range" << std::endl;
 		return;

@@ -15,3 +15,8 @@ add_executable (tasks_week1_shaked_vaknin)
 add_subdirectory (include)
 add_subdirectory (src)
 
+target_sources(tasks_week1_shaked_vaknin
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Vector.cpp
+    )

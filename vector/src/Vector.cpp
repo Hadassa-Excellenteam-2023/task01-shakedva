@@ -31,17 +31,12 @@ Vector::~Vector()
 /*
 * Copy assignment operator overload that receives a Vector and copy it's data. 
 */
-Vector& Vector::operator=(const Vector &other)
+Vector& Vector::operator=(Vector other)
 {
-	if (this == &other)
-		return *this;
-
-	delete[] _data;
-	_data = new int[other._capacity];
-	_size = other._size;
-	_capacity = other._capacity;
-	for (int i = 0; i < _size; i++)
-		_data[i] = other._data[i];
+	Vector tmp(other);
+	std::swap(_size, other._size);
+	std::swap(_capacity, other._capacity);
+	std::swap(_data, other._data);
 	return *this;
 }
 /*
@@ -51,26 +46,8 @@ Vector::Vector(Vector&& other)
 	: _size(other._size), _capacity(other._capacity), _data(other._data)
 {
 	other._size = 0;
-	other._capacity = 0;
+	other._capacity = INITIAL_CAPACITY;
 	other._data = nullptr;
-}
-/*
-* Move assignment operator overload that receives a lvalue Vector.
-*/
-Vector& Vector::operator=(Vector&& other)
-{
-	if (this != &other)
-	{
-		delete[] _data;
-		_data = other._data;
-		_size = other._size;
-		_capacity = other._capacity;
-		
-		other._size = 0;
-		other._capacity = 0;
-		other._data = nullptr;
-	}
-	return *this;
 }
 /*
 * Access specified element
@@ -100,7 +77,7 @@ bool Vector::isInRange(size_t index) const
 */
 void Vector::addCapacity()
 {
-	int capacity = (_capacity == 0) ? 1 : _capacity;
+	size_t capacity = (_capacity == 0) ? 1 : _capacity;
 	double multiply = capacity > 128 ? 1.5 : 2;
 	size_t newCapacity = (size_t)(capacity * multiply);
 	resize(newCapacity);
@@ -123,19 +100,17 @@ void Vector::resize(size_t capacity)
 {
 	if (capacity == _capacity) // no need to resize
 		return;
-	int* temp = new int[capacity];
+	int* temp;
 	if (capacity != 0)
+	temp = new int[capacity];
+	for (size_t i = 0; i < capacity; i++)
 	{
-		temp = new int[capacity];
-		for (size_t i = 0; i < capacity; i++)
-		{
-			// when capacity is 0, it has nothing to add from _data to temp. 
-			// add additional 0s to the end. 
- 			if (i < _capacity && _capacity > 0)
-				temp[i] = _data[i];
-			else
-				temp[i] = 0;
-		}
+		// when capacity is 0, it has nothing to add from _data to temp. 
+		// add additional 0s to the end. 
+ 		if (i < _capacity && _capacity > 0)
+			temp[i] = _data[i];
+		else
+			temp[i] = 0;
 	}
 	delete[] _data;
 	_data = temp;
@@ -194,7 +169,7 @@ void Vector::insert(size_t index, const int& value)
 		if (_size >= _capacity)
 			addCapacity();
 		
-		for (int i = _size; i > index; i--)
+		for (size_t i = _size; i > index; i--)
 			_data[i] = _data[i - 1];
 		_data[index] = value;
 		_size++;
@@ -232,16 +207,14 @@ void Vector::clear()
 * Checks if _data is lexicographically greater than the other Vector by comparing
 * their values. 
 */
-bool Vector::operator>(const Vector& other)
+bool Vector::operator>(const Vector& other) const
 {
 	size_t i = 0;
 	while (i < _size && i < other._size)
 	{
-		if (_data[i] > other._data[i])
-			return true;
-		if (_data[i] < other._data[i])
-			return false;
-		++i;
+		if (_data[i] != other._data[i])
+			return _data[i] > other._data[i];
+		++i;		
 	}
 	return _size > other._size;
 }
@@ -266,6 +239,7 @@ bool Vector::operator<=(const Vector& other)
 {
 	return *this < other || *this == other;
 }
+
 /*
 * Checks if _data is lexicographically equal to the other Vector.
 */
@@ -273,9 +247,7 @@ bool operator==(const Vector& l, const Vector& r)
 {
 	if (l.size() != r.size())
 		return false;
-	if (l.capacity() != r.capacity())
-		return false;
-	for (int i = 0; i < l.size(); i++)
+	for (size_t i = 0; i < l.size(); i++)
 	{
 		if (l[i] != r[i])
 			return false;
